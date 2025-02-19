@@ -25,10 +25,28 @@ export const Recipe = (props: Props) => {
         alert(count)
     }
 
-    const [value, setValue] = useState('');
+    const [favoritesRecipe, setfavoritesRecipe] = useState<{name: string; comment: string}[]>([]);
 
-    const comment = (e:ChangeEvent<HTMLInputElement>) => {
-        setValue(e.target.value);
+    const [name, setName] = useState('');
+    const [comment, setComment] = useState('');
+
+    const commentRecipe = () => {
+        if(comment == '' && name == ''){
+            alert('Comente antes de enviar')
+            return
+        }
+
+        setfavoritesRecipe([...favoritesRecipe, {name: name, comment: comment}])
+
+        setName('');
+        setComment('');
+    }
+
+    const deleteComment = (key:number) => {
+        setfavoritesRecipe(favoritesRecipe.filter((_value, index) => index != key))
+        //index ≠ key ?
+        // false (o index é igual a key)
+        //false nao filtra e consequentemente nao seta
     }
 
     if(show){
@@ -38,16 +56,47 @@ export const Recipe = (props: Props) => {
                 <Title name={props.name}/>
                 <Ingredients list={props.list}/>
                 <Font font={props.font}/>
-                <p>Comment:</p>
-                <input 
-                    onChange={comment}
-                    value={value}
+                <form>
+                    <fieldset>
+                        <legend>Commment about Recipe</legend>
+                        <p>
+                            <label htmlFor="name">Name:</label><br></br>
+                            <input
+                                onChange={(e) => setName(e.target.value)}
+                                value={name}
+                                id="name"
+                            />
+                        </p>
+                    
+                        <p>
+                            <label htmlFor="comment">Comment:</label><br></br>
+                            <textarea
+                                onChange={(e) => setComment(e.target.value)}
+                                value={comment}
+                                id="comment"
+                            />
+                        </p>
+                    </fieldset>
+                </form>
+                <Button 
+                    onClick={commentRecipe} 
+                    label={'Send'}
                 />
-                <p>{value}</p>
-                <div>
-                    { show && <Button onClick={handlePlus} label={props.label}/>}
-                </div>
                 
+                <div>
+                    <ul>
+                        {favoritesRecipe.map((value, key) => (
+                            <li key={key}>
+                                Name: {value.name}<br></br>
+                                Comment: {value.comment} 
+                                <Button
+                                    onClick={() => deleteComment(key)}
+                                    label="Excluir"
+                                />
+                            </li>
+                        ))}
+                    </ul>
+                </div>
             </>
         )
     }
